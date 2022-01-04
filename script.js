@@ -117,6 +117,7 @@ function getCell(letterPos, numPos) {
 const getCurrentLetter = currentPiece => currentPiece.parentElement.classList[1];
 const getCurrentNum = currentPiece => Number(currentPiece.parentElement.classList[2]);
 const selectCurrentCircles = () => document.querySelectorAll('.moveTo');
+const getCurrentCell = currentPiece => getCell(getCurrentLetter(currentPiece), getCurrentNum(currentPiece));
 
 function createMoveCircle() {
     const circle = document.createElement('img');
@@ -161,6 +162,7 @@ function checkTakePawn(letterPos, numPos, player) {
     if(takeLeft.hasChildNodes() && takeLeft.firstChild.classList.contains(negativeClass)) takeLeft.appendChild(createMoveCircle());
 }
 
+
 //move pawns
 for(let i=0;i<pawns.length;i++) {
     let currentPawn = pawns[i];
@@ -169,7 +171,7 @@ for(let i=0;i<pawns.length;i++) {
         if(currentPawn.classList.contains(`${player === 0 ? 'white' : 'black'}`)){
             const letterPos = getCurrentLetter(currentPawn);
             const numPos = getCurrentNum(currentPawn);
-            const currentCell = getCell(letterPos,numPos);
+            const currentCell = getCurrentCell(currentPawn);
             const nextCell = player === 0 ? getCell(letterPos,numPos+1) : getCell(letterPos, numPos-1);
             if(!nextCell.hasChildNodes()){
                 nextCell.appendChild(createMoveCircle());
