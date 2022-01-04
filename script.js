@@ -89,6 +89,17 @@ function createBoard() {
     }
 }
 
+function returnNumFromPositionLetter(cellLetter) {
+    if(cellLetter === 'a') return 0;
+    else if(cellLetter === 'b') return 1;
+    else if(cellLetter === 'c') return 2;
+    else if(cellLetter === 'd') return 3;
+    else if(cellLetter === 'e') return 4;
+    else if(cellLetter === 'f') return 5;
+    else if(cellLetter === 'g') return 6;
+    else if(cellLetter === 'h') return 7;
+}
+
 createBoard();
 const cells = document.querySelectorAll('.cell');
 const pawns = document.querySelectorAll('.pawn');
@@ -105,6 +116,7 @@ function getCell(letterPos, numPos) {
 }
 const getCurrentLetter = currentPiece => currentPiece.parentElement.classList[1];
 const getCurrentNum = currentPiece => Number(currentPiece.parentElement.classList[2]);
+const selectCurrentCircles = () => document.querySelectorAll('.moveTo');
 
 function createMoveCircle() {
     const circle = document.createElement('img');
@@ -124,8 +136,29 @@ function removeAllCircles() {
     }
 }
 
-function returnEventHandler(currentCell, func) {
-    currentCell.addEventListener('click',func);
+function makeAMove(currentPiece) {
+    const currCircles = selectCurrentCircles();
+    for(const circle of currCircles) {
+        circle.addEventListener('click', function() {
+            const targetCell = getCell(getCurrentLetter(circle),getCurrentNum(circle));
+            removeAllCircles();
+            if(targetCell.hasChildNodes()) targetCell.removeChild(targetCell.firstChild); 
+            targetCell.appendChild(currentPiece);
+            player === 0 ? player++: player--;
+        })
+    }
+}
+
+function checkTakePawn(letterPos, numPos, player) {
+    const currClass = player === 0 ? 'white' : 'black';
+    const negativeClass = player === 0 ? 'black' : 'white';
+    const nextRow = player === 0 ? numPos+1: numPos-1;
+    const checkRight = setPositionLetter(returnNumFromPositionLetter(letterPos)+1);
+    const checkLeft = setPositionLetter(returnNumFromPositionLetter(letterPos)-1)
+    const takeRight = getCell(checkRight, nextRow);
+    if(takeRight.hasChildNodes() && takeRight.firstChild.classList.contains(negativeClass)) takeRight.appendChild(createMoveCircle());
+    const takeLeft = getCell(checkLeft, nextRow);
+    if(takeLeft.hasChildNodes() && takeLeft.firstChild.classList.contains(negativeClass)) takeLeft.appendChild(createMoveCircle());
 }
 
 //move pawns
@@ -133,49 +166,20 @@ for(let i=0;i<pawns.length;i++) {
     let currentPawn = pawns[i];
     function pawnMove(){
         removeAllCircles();
-        if(currentPawn.classList.contains('white') && player === 0){
+        if(currentPawn.classList.contains(`${player === 0 ? 'white' : 'black'}`)){
             const letterPos = getCurrentLetter(currentPawn);
             const numPos = getCurrentNum(currentPawn);
             const currentCell = getCell(letterPos,numPos);
-            const nextCell = getCell(letterPos,numPos+1);
+            const nextCell = player === 0 ? getCell(letterPos,numPos+1) : getCell(letterPos, numPos-1);
             if(!nextCell.hasChildNodes()){
                 nextCell.appendChild(createMoveCircle());
-                if(currentCell.classList.contains('2') && !getCell(letterPos, numPos+2).hasChildNodes()) {
-                    const secondCellFirstMove = getCell(letterPos,numPos+2);
+                if(currentCell.classList.contains(`${player === 0 ? '2' : '7'}`) && !getCell(letterPos, numPos+(player === 0 ? 2 : -2)).hasChildNodes()) {
+                    const secondCellFirstMove = getCell(letterPos,numPos+(player === 0 ? 2 : -2));
                     secondCellFirstMove.appendChild(createMoveCircle());
                 }
             }
-            const currCircles = document.querySelectorAll('.moveTo');
-            for(const circle of currCircles) {
-                circle.addEventListener('click', function() {
-                    const targetCell = getCell(getCurrentLetter(circle),getCurrentNum(circle));
-                    removeAllCircles();
-                    targetCell.appendChild(currentPawn);
-                    player++;
-                })
-            }
-        }
-        if(currentPawn.classList.contains('black') && player === 1) {
-            const letterPos = getCurrentLetter(currentPawn);
-            const numPos = getCurrentNum(currentPawn);
-            const currentCell = getCell(letterPos,numPos);
-            const nextCell = getCell(letterPos,numPos-1);
-            if(!nextCell.hasChildNodes()){
-                nextCell.appendChild(createMoveCircle());
-                if(currentCell.classList.contains('7') && !getCell(letterPos,numPos-2).hasChildNodes()) {
-                    const secondCellFirstMove = getCell(letterPos,numPos-2);
-                    secondCellFirstMove.appendChild(createMoveCircle());
-                }
-            }
-            const currCircles = document.querySelectorAll('.moveTo');
-            for(const circle of currCircles) {
-                circle.addEventListener('click', function() {
-                    const targetCell = getCell(getCurrentLetter(circle),getCurrentNum(circle));
-                    removeAllCircles();
-                    targetCell.appendChild(currentPawn);
-                    player--;
-                })
-            }
+            checkTakePawn(letterPos, numPos, player);
+            makeAMove(currentPawn);
         }
     }
     currentPawn.addEventListener('click', pawnMove);
