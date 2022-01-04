@@ -1,0 +1,24 @@
+body {
+    background-color: cadetblue;
+}
+
+.container {
+    display: inline-grid;
+    position:absolute;
+    right: 600px;
+    grid-template-columns: repeat(8, auto);
+    margin: auto;
+}
+
+.cell {
+    display: flex;
+    width: 100px;
+    height: 100px;
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    height: 100%;
+    width: 100%;
+}
