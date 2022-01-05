@@ -221,37 +221,21 @@ function checkVertical(piece, player) {
     addCirclesVertically(backRow,player, piece);
 }
 
-function checkLeftSide(currLetter, currNum, negativeClass) {
-    let counter = 1;
-    let nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)-counter);
-    if(nextLetter !== undefined){
-        while(!getCell(nextLetter,currNum).hasChildNodes()) {
-            getCell(nextLetter,currNum).appendChild(createMoveCircle());
-            counter++;
-            nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)-counter);
-            if(nextLetter === undefined) break;
-        }
-        if(nextLetter !== undefined){
-            if(getCell(nextLetter,currNum).hasChildNodes() && getCell(nextLetter,currNum).firstChild.classList.contains(negativeClass)) {
-                getCell(nextLetter,currNum).appendChild(createMoveCircle());
-            }
-        }
-    }
-}
 
-function checkRightSide(currLetter, currNum, negativeClass) {
+function verticalCheck(piece, negativeClass, letter) {
+    const currLetter = getCurrentLetter(piece);
+    const currNum = getCurrentNum(piece);
     let counter = 1;
-    let nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)+counter);
-    if(nextLetter !== undefined){
-        while(!getCell(nextLetter,currNum).hasChildNodes()) {
-            getCell(nextLetter,currNum).appendChild(createMoveCircle());
+    if(letter !== undefined){
+        while(!getCell(letter,currNum).hasChildNodes()) {
+            getCell(letter,currNum).appendChild(createMoveCircle());
             counter++;
-            nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)+counter);
-            if(nextLetter === undefined) break;
+            letter = returnNumFromPositionLetter(letter) > returnNumFromPositionLetter(currLetter) ? setPositionLetter(returnNumFromPositionLetter(currLetter)+counter) : setPositionLetter(returnNumFromPositionLetter(currLetter)-counter);
+            if(letter === undefined) break;
         }
-        if(nextLetter !== undefined){
-            if(getCell(nextLetter,currNum).hasChildNodes() && getCell(nextLetter,currNum).firstChild.classList.contains(negativeClass)) {
-                getCell(nextLetter,currNum).appendChild(createMoveCircle());
+        if(letter !== undefined){
+            if(getCell(letter,currNum).hasChildNodes() && getCell(letter,currNum).firstChild.classList.contains(negativeClass)) {
+                getCell(letter,currNum).appendChild(createMoveCircle());
             }
         }
     }
@@ -259,10 +243,11 @@ function checkRightSide(currLetter, currNum, negativeClass) {
 
 function checkHorizontal(piece, player) {
     const currLetter = getCurrentLetter(piece);
-    const currNum = getCurrentNum(piece);
     const negativeClass = getNegativeClass(player);
-    checkLeftSide(currLetter, currNum, negativeClass);
-    checkRightSide(currLetter,currNum,negativeClass);
+    const leftLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)-1);
+    const rightLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)+1);
+    verticalCheck(piece, negativeClass, leftLetter);
+    verticalCheck(piece, negativeClass, rightLetter);
 }
 
 //move rooks
