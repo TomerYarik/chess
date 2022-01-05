@@ -239,11 +239,30 @@ function checkLeftSide(currLetter, currNum, negativeClass) {
     }
 }
 
+function checkRightSide(currLetter, currNum, negativeClass) {
+    let counter = 1;
+    let nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)+counter);
+    if(nextLetter !== undefined){
+        while(!getCell(nextLetter,currNum).hasChildNodes()) {
+            getCell(nextLetter,currNum).appendChild(createMoveCircle());
+            counter++;
+            nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)+counter);
+            if(nextLetter === undefined) break;
+        }
+        if(nextLetter !== undefined){
+            if(getCell(nextLetter,currNum).hasChildNodes() && getCell(nextLetter,currNum).firstChild.classList.contains(negativeClass)) {
+                getCell(nextLetter,currNum).appendChild(createMoveCircle());
+            }
+        }
+    }
+}
+
 function checkHorizontal(piece, player) {
     const currLetter = getCurrentLetter(piece);
     const currNum = getCurrentNum(piece);
     const negativeClass = getNegativeClass(player);
     checkLeftSide(currLetter, currNum, negativeClass);
+    checkRightSide(currLetter,currNum,negativeClass);
 }
 
 //move rooks
