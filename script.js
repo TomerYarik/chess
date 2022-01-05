@@ -151,15 +151,18 @@ function makeAMove(currentPiece) {
 }
 
 function checkTakePawn(letterPos, numPos, player) {
-    const currClass = player === 0 ? 'white' : 'black';
     const negativeClass = player === 0 ? 'black' : 'white';
     const nextRow = player === 0 ? numPos+1: numPos-1;
     const checkRight = setPositionLetter(returnNumFromPositionLetter(letterPos)+1);
-    const checkLeft = setPositionLetter(returnNumFromPositionLetter(letterPos)-1)
-    const takeRight = getCell(checkRight, nextRow);
-    if(takeRight.hasChildNodes() && takeRight.firstChild.classList.contains(negativeClass)) takeRight.appendChild(createMoveCircle());
-    const takeLeft = getCell(checkLeft, nextRow);
-    if(takeLeft.hasChildNodes() && takeLeft.firstChild.classList.contains(negativeClass)) takeLeft.appendChild(createMoveCircle());
+    if(checkRight !== undefined) {
+        const takeRight = getCell(checkRight, nextRow);
+        if(takeRight.hasChildNodes() && takeRight.firstChild.classList.contains(negativeClass)) takeRight.appendChild(createMoveCircle());
+    }
+    const checkLeft = setPositionLetter(returnNumFromPositionLetter(letterPos)-1);
+    if(checkLeft !== undefined) {
+        const takeLeft = getCell(checkLeft, nextRow);
+        if(takeLeft.hasChildNodes() && takeLeft.firstChild.classList.contains(negativeClass)) takeLeft.appendChild(createMoveCircle());
+    }
 }
 
 
@@ -185,4 +188,9 @@ for(let i=0;i<pawns.length;i++) {
         }
     }
     currentPawn.addEventListener('click', pawnMove);
+}
+
+//move rooks
+for(let i=0;i<rooks.length;i++) {
+    
 }
