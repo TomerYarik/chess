@@ -194,12 +194,14 @@ function checkVertical(piece, player) {
     const negativeClass = player === 0 ? 'black' : 'white';
     const currLetter = getCurrentLetter(piece);
     const currNum = getCurrentNum(piece);
+    console.log(`letter: ${currLetter}, num: ${currNum}`);
     let nextRow = currNum+1;
     if(getCell(currLetter,nextRow) !== undefined){
         while(!getCell(currLetter,nextRow).hasChildNodes()){
             const nextCell = getCell(currLetter,nextRow);
             nextCell.appendChild(createMoveCircle());
-            nextRow++;
+            if(nextRow !== 8) nextRow++;
+            else break;
         }
         if(getCell(currLetter,nextRow).hasChildNodes() && getCell(currLetter,nextRow).firstChild.classList.contains(negativeClass)){
             getCell(currLetter,nextRow).appendChild(createMoveCircle());
@@ -210,7 +212,8 @@ function checkVertical(piece, player) {
         while(!getCell(currLetter,backRow).hasChildNodes()){
             const nextCell = getCell(currLetter,backRow);
             nextCell.appendChild(createMoveCircle());
-            backRow--;
+            if(backRow !== 1) backRow--;
+            else break;
         }
         if(getCell(currLetter,backRow).hasChildNodes() && getCell(currLetter,backRow).firstChild.classList.contains(negativeClass)){
             getCell(currLetter,backRow).appendChild(createMoveCircle());
