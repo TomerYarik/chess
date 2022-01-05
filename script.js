@@ -190,7 +190,33 @@ for(let i=0;i<pawns.length;i++) {
     currentPawn.addEventListener('click', pawnMove);
 }
 
+function checkForward(piece, player) {
+    const negativeClass = player === 0 ? 'black' : 'white';
+    const currLetter = getCurrentLetter(piece);
+    const currNum = getCurrentNum(piece);
+    let nextRow = currNum+1;
+    while(!getCell(currLetter,nextRow).hasChildNodes()){
+        const nextCell = getCell(currLetter,nextRow);
+        nextCell.appendChild(createMoveCircle());
+        nextRow++;
+    }
+    if(getCell(currLetter,nextRow).hasChildNodes() && getCell(currLetter,nextRow).firstChild.classList.contains(negativeClass)){
+        getCell(currLetter,nextRow).appendChild(createMoveCircle());
+    }
+}
+
 //move rooks
 for(let i=0;i<rooks.length;i++) {
-    
+    const currentRook = rooks[i];
+    function rookMove() {
+        removeAllCircles();
+        if(currentRook.classList.contains(`${player === 0 ? 'white' : 'black'}`)) {
+            const currLetter = getCurrentLetter(currentRook);
+            const currNum = getCurrentNum(currentRook);
+            const currentCell = getCurrentCell(currentRook);
+            checkForward(currentRook, player);
+            makeAMove(currentRook);
+        }
+    }
+    currentRook.addEventListener('click', rookMove)
 }
