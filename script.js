@@ -190,18 +190,31 @@ for(let i=0;i<pawns.length;i++) {
     currentPawn.addEventListener('click', pawnMove);
 }
 
-function checkForward(piece, player) {
+function checkVertical(piece, player) {
     const negativeClass = player === 0 ? 'black' : 'white';
     const currLetter = getCurrentLetter(piece);
     const currNum = getCurrentNum(piece);
     let nextRow = currNum+1;
-    while(!getCell(currLetter,nextRow).hasChildNodes()){
-        const nextCell = getCell(currLetter,nextRow);
-        nextCell.appendChild(createMoveCircle());
-        nextRow++;
+    if(getCell(currLetter,nextRow) !== undefined){
+        while(!getCell(currLetter,nextRow).hasChildNodes()){
+            const nextCell = getCell(currLetter,nextRow);
+            nextCell.appendChild(createMoveCircle());
+            nextRow++;
+        }
+        if(getCell(currLetter,nextRow).hasChildNodes() && getCell(currLetter,nextRow).firstChild.classList.contains(negativeClass)){
+            getCell(currLetter,nextRow).appendChild(createMoveCircle());
+        }
     }
-    if(getCell(currLetter,nextRow).hasChildNodes() && getCell(currLetter,nextRow).firstChild.classList.contains(negativeClass)){
-        getCell(currLetter,nextRow).appendChild(createMoveCircle());
+    let backRow = currNum-1;
+    if(getCell(currLetter, backRow) !== undefined) {
+        while(!getCell(currLetter,backRow).hasChildNodes()){
+            const nextCell = getCell(currLetter,backRow);
+            nextCell.appendChild(createMoveCircle());
+            backRow--;
+        }
+        if(getCell(currLetter,backRow).hasChildNodes() && getCell(currLetter,backRow).firstChild.classList.contains(negativeClass)){
+            getCell(currLetter,backRow).appendChild(createMoveCircle());
+        }
     }
 }
 
@@ -214,7 +227,7 @@ for(let i=0;i<rooks.length;i++) {
             const currLetter = getCurrentLetter(currentRook);
             const currNum = getCurrentNum(currentRook);
             const currentCell = getCurrentCell(currentRook);
-            checkForward(currentRook, player);
+            checkVertical(currentRook, player);
             makeAMove(currentRook);
         }
     }
