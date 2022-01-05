@@ -118,6 +118,7 @@ const getCurrentLetter = currentPiece => currentPiece.parentElement.classList[1]
 const getCurrentNum = currentPiece => Number(currentPiece.parentElement.classList[2]);
 const selectCurrentCircles = () => document.querySelectorAll('.moveTo');
 const getCurrentCell = currentPiece => getCell(getCurrentLetter(currentPiece), getCurrentNum(currentPiece));
+const getNegativeClass = player => player === 0 ? 'black' : 'white';
 
 function createMoveCircle() {
     const circle = document.createElement('img');
@@ -151,7 +152,7 @@ function makeAMove(currentPiece) {
 }
 
 function checkTakePawn(letterPos, numPos, player) {
-    const negativeClass = player === 0 ? 'black' : 'white';
+    const negativeClass = getNegativeClass(player);
     const nextRow = player === 0 ? numPos+1: numPos-1;
     const checkRight = setPositionLetter(returnNumFromPositionLetter(letterPos)+1);
     if(checkRight !== undefined) {
@@ -190,8 +191,10 @@ for(let i=0;i<pawns.length;i++) {
     currentPawn.addEventListener('click', pawnMove);
 }
 
-function addCirclesVertically(currLetter, row, currNum, player) {
-    const negativeClass = player === 0 ? 'black' : 'white';
+function addCirclesVertically(row, player, piece) {
+    const currLetter = getCurrentLetter(piece);
+    const currNum = getCurrentNum(piece);
+    const negativeClass = getNegativeClass(player);
     if(getCell(currLetter, row) !== undefined) {
         while(!getCell(currLetter,row).hasChildNodes()){
             const nextCell = getCell(currLetter,row);
@@ -212,12 +215,35 @@ function addCirclesVertically(currLetter, row, currNum, player) {
 }
 
 function checkVertical(piece, player) {
+    let nextRow = getCurrentNum(piece)+1;
+    let backRow = getCurrentNum(piece)-1;
+    addCirclesVertically(nextRow,player,piece);
+    addCirclesVertically(backRow,player, piece);
+}
+
+function checkLeftSide(currLetter, currNum, negativeClass) {
+    let counter = 1;
+    let nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)-counter);
+    if(nextLetter !== undefined){
+        while(!getCell(nextLetter,currNum).hasChildNodes()) {
+            getCell(nextLetter,currNum).appendChild(createMoveCircle());
+            counter++;
+            nextLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)-counter);
+            if(nextLetter === undefined) break;
+        }
+        if(nextLetter !== undefined){
+            if(getCell(nextLetter,currNum).hasChildNodes() && getCell(nextLetter,currNum).firstChild.classList.contains(negativeClass)) {
+                getCell(nextLetter,currNum).appendChild(createMoveCircle());
+            }
+        }
+    }
+}
+
+function checkHorizontal(piece, player) {
     const currLetter = getCurrentLetter(piece);
     const currNum = getCurrentNum(piece);
-    let nextRow = currNum+1;
-    let backRow = currNum-1;
-    addCirclesVertically(currLetter,nextRow,currNum,player);
-    addCirclesVertically(currLetter,backRow,currNum,player);
+    const negativeClass = getNegativeClass(player);
+    checkLeftSide(currLetter, currNum, negativeClass);
 }
 
 //move rooks
@@ -230,6 +256,7 @@ for(let i=0;i<rooks.length;i++) {
             const currNum = getCurrentNum(currentRook);
             const currentCell = getCurrentCell(currentRook);
             checkVertical(currentRook, player);
+            checkHorizontal(currentRook, player);
             makeAMove(currentRook);
         }
     }
