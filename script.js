@@ -256,9 +256,6 @@ for(let i=0;i<rooks.length;i++) {
     function rookMove() {
         removeAllCircles();
         if(currentRook.classList.contains(`${player === 0 ? 'white' : 'black'}`)) {
-            const currLetter = getCurrentLetter(currentRook);
-            const currNum = getCurrentNum(currentRook);
-            const currentCell = getCurrentCell(currentRook);
             checkVertical(currentRook, player);
             checkHorizontal(currentRook, player);
             makeAMove(currentRook);
