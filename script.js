@@ -190,35 +190,34 @@ for(let i=0;i<pawns.length;i++) {
     currentPawn.addEventListener('click', pawnMove);
 }
 
-function checkVertical(piece, player) {
+function addCirclesVertically(currLetter, row, currNum, player) {
     const negativeClass = player === 0 ? 'black' : 'white';
+    if(getCell(currLetter, row) !== undefined) {
+        while(!getCell(currLetter,row).hasChildNodes()){
+            const nextCell = getCell(currLetter,row);
+            nextCell.appendChild(createMoveCircle());
+            if(currNum>row){
+                if(row !== 1) row--;
+                else break;
+            }
+            else{
+                if(row !== 8) row++;
+                else break;
+            }
+        }
+        if(getCell(currLetter,row).hasChildNodes() && getCell(currLetter,row).firstChild.classList.contains(negativeClass)){
+            getCell(currLetter,row).appendChild(createMoveCircle());
+        }
+    }
+}
+
+function checkVertical(piece, player) {
     const currLetter = getCurrentLetter(piece);
     const currNum = getCurrentNum(piece);
-    console.log(`letter: ${currLetter}, num: ${currNum}`);
     let nextRow = currNum+1;
-    if(getCell(currLetter,nextRow) !== undefined){
-        while(!getCell(currLetter,nextRow).hasChildNodes()){
-            const nextCell = getCell(currLetter,nextRow);
-            nextCell.appendChild(createMoveCircle());
-            if(nextRow !== 8) nextRow++;
-            else break;
-        }
-        if(getCell(currLetter,nextRow).hasChildNodes() && getCell(currLetter,nextRow).firstChild.classList.contains(negativeClass)){
-            getCell(currLetter,nextRow).appendChild(createMoveCircle());
-        }
-    }
     let backRow = currNum-1;
-    if(getCell(currLetter, backRow) !== undefined) {
-        while(!getCell(currLetter,backRow).hasChildNodes()){
-            const nextCell = getCell(currLetter,backRow);
-            nextCell.appendChild(createMoveCircle());
-            if(backRow !== 1) backRow--;
-            else break;
-        }
-        if(getCell(currLetter,backRow).hasChildNodes() && getCell(currLetter,backRow).firstChild.classList.contains(negativeClass)){
-            getCell(currLetter,backRow).appendChild(createMoveCircle());
-        }
-    }
+    addCirclesVertically(currLetter,nextRow,currNum,player);
+    addCirclesVertically(currLetter,backRow,currNum,player);
 }
 
 //move rooks
