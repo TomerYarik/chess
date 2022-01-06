@@ -119,8 +119,7 @@ function removeAllCircles() {
 }
 
 function makeAMove(currentPiece) {
-    const currCircles = selectCurrentCircles();
-    for(const circle of currCircles) {
+    for(const circle of selectCurrentCircles()) {
         circle.addEventListener('click', function() {
             const targetCell = getCell(getCurrentColumn(circle),getCurrentRow(circle));
             removeAllCircles();
@@ -131,10 +130,10 @@ function makeAMove(currentPiece) {
     }
 }
 
-function checkSideForward(letter, nextRow) {
+function checkSideForward(col, nextRow) {
     const negativeClass = getNegativeClass()
-    if(letter !== undefined) {
-        const takeCell = getCell(letter, nextRow);
+    if(col !== undefined) {
+        const takeCell = getCell(col, nextRow);
         if(takeCell.hasChildNodes() && takeCell.firstChild.classList.contains(negativeClass)) takeCell.appendChild(createMoveCircle());
     }
 }
