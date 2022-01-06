@@ -276,8 +276,8 @@ function checkDiagonalLeft(piece) {
 for(let i=0;i<pawns.length;i++) {
     const currentPawn = pawns[i];
     function pawnMove(){
-        removeAllCircles();
         if(hasCurrentclass(currentPawn)){
+            removeAllCircles();
             pawnStep(currentPawn);
             checkTakePawn(currentPawn);
             makeAMove(currentPawn);
@@ -290,8 +290,8 @@ for(let i=0;i<pawns.length;i++) {
 for(let i=0;i<rooks.length;i++) {
     const currentRook = rooks[i];
     function rookMove() {
-        removeAllCircles();
         if(hasCurrentclass(currentRook)) {
+            removeAllCircles();
             checkVertical(currentRook);
             checkHorizontal(currentRook);
             makeAMove(currentRook);
@@ -304,12 +304,28 @@ for(let i=0;i<rooks.length;i++) {
 for(let i=0;i<bishops.length;i++) {
     const currentBish = bishops[i];
     function bishopMove() {
-        removeAllCircles();
         if(hasCurrentclass(currentBish)) {
+            removeAllCircles();
             checkDiagonalRight(currentBish);
             checkDiagonalLeft(currentBish);
             makeAMove(currentBish);
         }
     }
     currentBish.addEventListener('click',bishopMove);
+}
+
+//move queens
+for(let i=0;i<queens.length;i++){
+    const currentQueen = queens[i];
+    function queenMove() {
+        if(hasCurrentclass(currentQueen)) {
+            removeAllCircles();
+            checkDiagonalLeft(currentQueen);
+            checkDiagonalRight(currentQueen);
+            checkHorizontal(currentQueen);
+            checkVertical(currentQueen);
+            makeAMove(currentQueen);
+        }
+    }
+    currentQueen.addEventListener('click', queenMove)
 }
