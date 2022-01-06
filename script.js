@@ -115,7 +115,7 @@ function getCell(letterPos, numPos) {
     }
 }
 const getCurrentLetter = currentPiece => currentPiece.parentElement.classList[1];
-const getCurrentNum = currentPiece => Number(currentPiece.parentElement.classList[2]);
+const getCurrentRow = currentPiece => Number(currentPiece.parentElement.classList[2]);
 const selectCurrentCircles = () => document.querySelectorAll('.moveTo');
 const getNegativeClass = player => player === 0 ? 'black' : 'white';
 
@@ -132,7 +132,7 @@ function removeCircle(currentCell) {
 
 function removeAllCircles() {
     for(const circle of document.querySelectorAll('.moveTo')) {
-        const currentCell = getCell(getCurrentLetter(circle),getCurrentNum(circle));
+        const currentCell = getCell(getCurrentLetter(circle),getCurrentRow(circle));
         removeCircle(currentCell);
     }
 }
@@ -141,7 +141,7 @@ function makeAMove(currentPiece) {
     const currCircles = selectCurrentCircles();
     for(const circle of currCircles) {
         circle.addEventListener('click', function() {
-            const targetCell = getCell(getCurrentLetter(circle),getCurrentNum(circle));
+            const targetCell = getCell(getCurrentLetter(circle),getCurrentRow(circle));
             removeAllCircles();
             if(targetCell.hasChildNodes()) targetCell.removeChild(targetCell.firstChild); 
             targetCell.appendChild(currentPiece);
@@ -159,7 +159,7 @@ function checkSideForward(letter, nextRow, negativeClass) {
 
 function checkTakePawn(piece, player) {
     const letterPos = getCurrentLetter(piece);
-    const numPos = getCurrentNum(piece);
+    const numPos = getCurrentRow(piece);
     const negativeClass = getNegativeClass(player);
     const nextRow = player === 0 ? numPos+1: numPos-1;
     const checkRight = setPositionLetter(returnNumFromPositionLetter(letterPos)+1);
@@ -168,9 +168,9 @@ function checkTakePawn(piece, player) {
     checkSideForward(checkRight, nextRow, negativeClass);
 }
 
-function pawnStep(piece, player) {
+function pawnStep(piece) {
     const letterPos = getCurrentLetter(piece);
-    const numPos = getCurrentNum(piece);
+    const numPos = getCurrentRow(piece);
     const nextCell = player === 0 ? getCell(letterPos,numPos+1) : getCell(letterPos, numPos-1);
     const currentCell = getCell(letterPos, numPos);
     if(!nextCell.hasChildNodes()){
@@ -182,23 +182,10 @@ function pawnStep(piece, player) {
     }
 }
 
-//move pawns
-for(let i=0;i<pawns.length;i++) {
-    let currentPawn = pawns[i];
-    function pawnMove(){
-        removeAllCircles();
-        if(currentPawn.classList.contains(`${player === 0 ? 'white' : 'black'}`)){
-            pawnStep(currentPawn, player);
-            checkTakePawn(currentPawn, player);
-            makeAMove(currentPawn);
-        }
-    }
-    currentPawn.addEventListener('click', pawnMove);
-}
 
 function addCirclesVertically(row, player, piece) {
     const currLetter = getCurrentLetter(piece);
-    const currNum = getCurrentNum(piece);
+    const currNum = getCurrentRow(piece);
     const negativeClass = getNegativeClass(player);
     if(getCell(currLetter, row) !== undefined) {
         while(!getCell(currLetter,row).hasChildNodes()){
@@ -219,9 +206,9 @@ function addCirclesVertically(row, player, piece) {
     }
 }
 
-function checkVertical(piece, player) {
-    let nextRow = getCurrentNum(piece)+1;
-    let backRow = getCurrentNum(piece)-1;
+function checkVertical(piece) {
+    let nextRow = getCurrentRow(piece)+1;
+    let backRow = getCurrentRow(piece)-1;
     addCirclesVertically(nextRow,player,piece);
     addCirclesVertically(backRow,player, piece);
 }
@@ -229,7 +216,7 @@ function checkVertical(piece, player) {
 
 function addCirclesHorizontally(piece, negativeClass, letter) {
     const currLetter = getCurrentLetter(piece);
-    const currNum = getCurrentNum(piece);
+    const currNum = getCurrentRow(piece);
     let counter = 1;
     if(letter !== undefined){
         while(!getCell(letter,currNum).hasChildNodes()) {
@@ -255,6 +242,20 @@ function checkHorizontal(piece, player) {
     addCirclesHorizontally(piece, negativeClass, rightLetter);
 }
 
+//move pawns
+for(let i=0;i<pawns.length;i++) {
+    let currentPawn = pawns[i];
+    function pawnMove(){
+        removeAllCircles();
+        if(currentPawn.classList.contains(`${player === 0 ? 'white' : 'black'}`)){
+            pawnStep(currentPawn, player);
+            checkTakePawn(currentPawn, player);
+            makeAMove(currentPawn);
+        }
+    }
+    currentPawn.addEventListener('click', pawnMove);
+}
+
 //move rooks
 for(let i=0;i<rooks.length;i++) {
     const currentRook = rooks[i];
@@ -267,4 +268,4 @@ for(let i=0;i<rooks.length;i++) {
         }
     }
     currentRook.addEventListener('click', rookMove)
-}
+} 
