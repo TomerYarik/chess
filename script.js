@@ -1,5 +1,6 @@
 const board = document.querySelector('.container');
 let player = 0;
+const arrOfLetters = ['a', 'b' , 'c', 'd', 'e', 'f', 'g', 'h'];
 
 function createCell(color) {
     const cell = document.createElement('div');
@@ -50,18 +51,8 @@ function putPieces(cell, i, j) {
     }
 }
 
-function setPositionLetter(i) {
-    let letter;
-    if(i===7) letter = 'h';
-    else if(i === 6) letter = 'g';
-    else if(i===5) letter = 'f';
-    else if(i===4) letter = 'e';
-    else if(i===3) letter = 'd';
-    else if(i===2) letter = 'c';
-    else if(i===1) letter = 'b';
-    else if(i===0) letter = 'a';
-    return letter;
-}
+const setLetterFromNum = i => arrOfLetters[i];
+const getColumnNum = colLetter => arrOfLetters.indexOf(colLetter);
 
 function createBoard() {
     let arr = [];
@@ -72,7 +63,7 @@ function createBoard() {
         for(let j=0;j<8;j++) {
             const color = colorIndicator === 0 ? 'AntiqueWhite' : 'Sienna';
             const cell = createCell(color);
-            const currentLetter = setPositionLetter(j);
+            const currentLetter = setLetterFromNum(j);
             cell.classList.add(`${currentLetter}`);
             cell.classList.add(`${i+1}`);
             if(i===0 || i===1 || i===6 || i===7) putPieces(cell, i, j);
@@ -89,17 +80,6 @@ function createBoard() {
     }
 }
 
-function returnNumFromPositionLetter(cellLetter) {
-    if(cellLetter === 'a') return 0;
-    else if(cellLetter === 'b') return 1;
-    else if(cellLetter === 'c') return 2;
-    else if(cellLetter === 'd') return 3;
-    else if(cellLetter === 'e') return 4;
-    else if(cellLetter === 'f') return 5;
-    else if(cellLetter === 'g') return 6;
-    else if(cellLetter === 'h') return 7;
-}
-
 createBoard();
 const cells = document.querySelectorAll('.cell');
 const pawns = document.querySelectorAll('.pawn');
@@ -109,15 +89,16 @@ const bishops = document.querySelectorAll('.bishop');
 const queens = document.querySelectorAll('.queen');
 const kings = document.querySelectorAll('.king');
 
-function getCell(letterPos, numPos) {
+function getCell(currCol, currRow) {
     for(const cell of cells){
-        if(cell.classList.contains(letterPos) && cell.classList.contains(numPos)) return cell;
+        if(cell.classList.contains(currCol) && cell.classList.contains(currRow)) return cell;
     }
 }
-const getCurrentLetter = currentPiece => currentPiece.parentElement.classList[1];
+const getCurrentColumn = currentPiece => currentPiece.parentElement.classList[1];
 const getCurrentRow = currentPiece => Number(currentPiece.parentElement.classList[2]);
 const selectCurrentCircles = () => document.querySelectorAll('.moveTo');
-const getNegativeClass = player => player === 0 ? 'black' : 'white';
+const getNegativeClass = () => player === 0 ? 'black' : 'white';
+const hasCurrentclass = piece => piece.classList.contains(`${player === 0 ? 'white' : 'black'}`);
 
 function createMoveCircle() {
     const circle = document.createElement('img');
@@ -132,7 +113,7 @@ function removeCircle(currentCell) {
 
 function removeAllCircles() {
     for(const circle of document.querySelectorAll('.moveTo')) {
-        const currentCell = getCell(getCurrentLetter(circle),getCurrentRow(circle));
+        const currentCell = getCell(getCurrentColumn(circle),getCurrentRow(circle));
         removeCircle(currentCell);
     }
 }
@@ -141,7 +122,7 @@ function makeAMove(currentPiece) {
     const currCircles = selectCurrentCircles();
     for(const circle of currCircles) {
         circle.addEventListener('click', function() {
-            const targetCell = getCell(getCurrentLetter(circle),getCurrentRow(circle));
+            const targetCell = getCell(getCurrentColumn(circle),getCurrentRow(circle));
             removeAllCircles();
             if(targetCell.hasChildNodes()) targetCell.removeChild(targetCell.firstChild); 
             targetCell.appendChild(currentPiece);
@@ -150,48 +131,48 @@ function makeAMove(currentPiece) {
     }
 }
 
-function checkSideForward(letter, nextRow, negativeClass) {
+function checkSideForward(letter, nextRow) {
+    const negativeClass = getNegativeClass()
     if(letter !== undefined) {
         const takeCell = getCell(letter, nextRow);
         if(takeCell.hasChildNodes() && takeCell.firstChild.classList.contains(negativeClass)) takeCell.appendChild(createMoveCircle());
     }
 }
 
-function checkTakePawn(piece, player) {
-    const letterPos = getCurrentLetter(piece);
-    const numPos = getCurrentRow(piece);
-    const negativeClass = getNegativeClass(player);
-    const nextRow = player === 0 ? numPos+1: numPos-1;
-    const checkRight = setPositionLetter(returnNumFromPositionLetter(letterPos)+1);
-    const checkLeft = setPositionLetter(returnNumFromPositionLetter(letterPos)-1);
-    checkSideForward(checkLeft, nextRow, negativeClass);
-    checkSideForward(checkRight, nextRow, negativeClass);
+function checkTakePawn(piece) {
+    const currCol = getCurrentColumn(piece);
+    const currRow = getCurrentRow(piece);
+    const nextRow = player === 0 ? currRow+1: currRow-1;
+    const checkRight = setLetterFromNum(getColumnNum(currCol)+1);
+    const checkLeft = setLetterFromNum(getColumnNum(currCol)-1);
+    checkSideForward(checkLeft, nextRow);
+    checkSideForward(checkRight, nextRow);
 }
 
 function pawnStep(piece) {
-    const letterPos = getCurrentLetter(piece);
-    const numPos = getCurrentRow(piece);
-    const nextCell = player === 0 ? getCell(letterPos,numPos+1) : getCell(letterPos, numPos-1);
-    const currentCell = getCell(letterPos, numPos);
+    const currCol = getCurrentColumn(piece);
+    const currRow = getCurrentRow(piece);
+    const nextCell = player === 0 ? getCell(currCol,currRow+1) : getCell(currCol, currRow-1);
+    const currentCell = getCell(currCol, currRow);
     if(!nextCell.hasChildNodes()){
         nextCell.appendChild(createMoveCircle());
-        if(currentCell.classList.contains(`${player === 0 ? '2' : '7'}`) && !getCell(letterPos, numPos+(player === 0 ? 2 : -2)).hasChildNodes()) {
-            const secondCellFirstMove = getCell(letterPos,numPos+(player === 0 ? 2 : -2));
+        if(currentCell.classList.contains(`${player === 0 ? '2' : '7'}`) && !getCell(currCol, currRow+(player === 0 ? 2 : -2)).hasChildNodes()) {
+            const secondCellFirstMove = getCell(currCol,currRow+(player === 0 ? 2 : -2));
             secondCellFirstMove.appendChild(createMoveCircle());
         }
     }
 }
 
 
-function addCirclesVertically(row, player, piece) {
-    const currLetter = getCurrentLetter(piece);
-    const currNum = getCurrentRow(piece);
+function addCirclesVertically(row, piece) {
+    const currCol = getCurrentColumn(piece);
+    const currRow = getCurrentRow(piece);
     const negativeClass = getNegativeClass(player);
-    if(getCell(currLetter, row) !== undefined) {
-        while(!getCell(currLetter,row).hasChildNodes()){
-            const nextCell = getCell(currLetter,row);
+    if(getCell(currCol, row) !== undefined) {
+        while(!getCell(currCol,row).hasChildNodes()){
+            const nextCell = getCell(currCol,row);
             nextCell.appendChild(createMoveCircle());
-            if(currNum>row){
+            if(currRow>row){
                 if(row !== 1) row--;
                 else break;
             }
@@ -200,56 +181,56 @@ function addCirclesVertically(row, player, piece) {
                 else break;
             }
         }
-        if(getCell(currLetter,row).hasChildNodes() && getCell(currLetter,row).firstChild.classList.contains(negativeClass)){
-            getCell(currLetter,row).appendChild(createMoveCircle());
+        if(getCell(currCol,row).hasChildNodes() && getCell(currCol,row).firstChild.classList.contains(negativeClass)){
+            getCell(currCol,row).appendChild(createMoveCircle());
         }
     }
 }
 
 function checkVertical(piece) {
-    let nextRow = getCurrentRow(piece)+1;
-    let backRow = getCurrentRow(piece)-1;
-    addCirclesVertically(nextRow,player,piece);
-    addCirclesVertically(backRow,player, piece);
+    const nextRow = getCurrentRow(piece)+1;
+    const backRow = getCurrentRow(piece)-1;
+    addCirclesVertically(nextRow,piece);
+    addCirclesVertically(backRow, piece);
 }
 
 
-function addCirclesHorizontally(piece, negativeClass, letter) {
-    const currLetter = getCurrentLetter(piece);
-    const currNum = getCurrentRow(piece);
+function addCirclesHorizontally(piece, col) {
+    const negativeClass = getNegativeClass();
+    const currCol = getCurrentColumn(piece);
+    const currRow = getCurrentRow(piece);
     let counter = 1;
-    if(letter !== undefined){
-        while(!getCell(letter,currNum).hasChildNodes()) {
-            getCell(letter,currNum).appendChild(createMoveCircle());
+    if(col !== undefined){
+        while(!getCell(col,currRow).hasChildNodes()) {
+            getCell(col,currRow).appendChild(createMoveCircle());
             counter++;
-            letter = returnNumFromPositionLetter(letter) > returnNumFromPositionLetter(currLetter) ? setPositionLetter(returnNumFromPositionLetter(currLetter)+counter) : setPositionLetter(returnNumFromPositionLetter(currLetter)-counter);
-            if(letter === undefined) break;
+            col = getColumnNum(col) > getColumnNum(currCol) ? setLetterFromNum(getColumnNum(currCol)+counter) : setLetterFromNum(getColumnNum(currCol)-counter);
+            if(col === undefined) break;
         }
-        if(letter !== undefined){
-            if(getCell(letter,currNum).hasChildNodes() && getCell(letter,currNum).firstChild.classList.contains(negativeClass)) {
-                getCell(letter,currNum).appendChild(createMoveCircle());
+        if(col !== undefined){
+            if(getCell(col,currRow).hasChildNodes() && getCell(col,currRow).firstChild.classList.contains(negativeClass)) {
+                getCell(col,currRow).appendChild(createMoveCircle());
             }
         }
     }
 }
 
-function checkHorizontal(piece, player) {
-    const currLetter = getCurrentLetter(piece);
-    const negativeClass = getNegativeClass(player);
-    const leftLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)-1);
-    const rightLetter = setPositionLetter(returnNumFromPositionLetter(currLetter)+1);
-    addCirclesHorizontally(piece, negativeClass, leftLetter);
-    addCirclesHorizontally(piece, negativeClass, rightLetter);
+function checkHorizontal(piece) {
+    const currCol = getCurrentColumn(piece);
+    const leftCol = setLetterFromNum(getColumnNum(currCol)-1);
+    const rightCol = setLetterFromNum(getColumnNum(currCol)+1);
+    addCirclesHorizontally(piece, leftCol);
+    addCirclesHorizontally(piece, rightCol);
 }
 
 //move pawns
 for(let i=0;i<pawns.length;i++) {
-    let currentPawn = pawns[i];
+    const currentPawn = pawns[i];
     function pawnMove(){
         removeAllCircles();
-        if(currentPawn.classList.contains(`${player === 0 ? 'white' : 'black'}`)){
-            pawnStep(currentPawn, player);
-            checkTakePawn(currentPawn, player);
+        if(hasCurrentclass(currentPawn)){
+            pawnStep(currentPawn);
+            checkTakePawn(currentPawn);
             makeAMove(currentPawn);
         }
     }
@@ -261,9 +242,9 @@ for(let i=0;i<rooks.length;i++) {
     const currentRook = rooks[i];
     function rookMove() {
         removeAllCircles();
-        if(currentRook.classList.contains(`${player === 0 ? 'white' : 'black'}`)) {
-            checkVertical(currentRook, player);
-            checkHorizontal(currentRook, player);
+        if(hasCurrentclass(currentRook)) {
+            checkVertical(currentRook);
+            checkHorizontal(currentRook);
             makeAMove(currentRook);
         }
     }
