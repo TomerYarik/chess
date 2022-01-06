@@ -219,38 +219,57 @@ function checkHorizontal(piece) {
     addCirclesHorizontally(piece, rightCol);
 }
 
-const nextDiagonalCell = (currCol, currRow, counter) => getCell(setLetterFromNum(getColumnNum(currCol)+counter), currRow+counter);
+const nextDiagonalCellRight = (currCol, currRow, counter) => getCell(setLetterFromNum(getColumnNum(currCol)+counter), currRow+counter);
+const nextDiagonalCellLeft = (currCol, currRow, counter) => getCell(setLetterFromNum(getColumnNum(currCol)-counter), currRow+counter);
 
-function checkDiagonalRight(piece) {
-    let counter = 1;
+function checkDiagonalRightFunc(piece, counter) {
     const negativeClass = getNegativeClass();
     const currCol = getCurrentColumn(piece);
     const currRow = getCurrentRow(piece);
-    let nextCell = nextDiagonalCell(currCol,currRow,counter);
+    let nextCell = nextDiagonalCellRight(currCol,currRow,counter);
     if(nextCell !== undefined) {
         while(!nextCell.hasChildNodes()) {
             nextCell.appendChild(createMoveCircle());
-            counter++;
-            nextCell = nextDiagonalCell(currCol,currRow,counter);
+            counter > 0 ? counter++ : counter--;
+            nextCell = nextDiagonalCellRight(currCol,currRow,counter);
             if(nextCell === undefined) break;
-            else if(nextCell.hasChildNodes() && nextCell.firstChild.classList.contains(negativeClass)) {
+        }
+        if(nextCell !== undefined){
+            if(nextCell.hasChildNodes() && nextCell.firstChild.classList.contains(negativeClass)) {
                 nextCell.appendChild(createMoveCircle());
             }
         }
     }
-    counter = -1;
-    nextCell = nextDiagonalCell(currCol,currRow,counter);
+}
+
+function checkDiagonalLeftFunc(piece, counter) {
+    const negativeClass = getNegativeClass();
+    const currCol = getCurrentColumn(piece);
+    const currRow = getCurrentRow(piece);
+    let nextCell = nextDiagonalCellLeft(currCol,currRow,counter);
     if(nextCell !== undefined) {
         while(!nextCell.hasChildNodes()) {
             nextCell.appendChild(createMoveCircle());
-            counter--;
-            nextCell = nextDiagonalCell(currCol,currRow,counter);
+            counter > 0 ? counter++ : counter--;
+            nextCell = nextDiagonalCellLeft(currCol,currRow,counter);
             if(nextCell === undefined) break;
-            else if(nextCell.hasChildNodes() && nextCell.firstChild.classList.contains(negativeClass)) {
+        }
+        if(nextCell !== undefined){
+            if(nextCell.hasChildNodes() && nextCell.firstChild.classList.contains(negativeClass)) {
                 nextCell.appendChild(createMoveCircle());
             }
         }
     }
+}
+
+function checkDiagonalRight(piece) {
+    checkDiagonalRightFunc(piece,1);
+    checkDiagonalRightFunc(piece,-1);
+}
+
+function checkDiagonalLeft(piece) {
+    checkDiagonalLeftFunc(piece, 1);
+    checkDiagonalLeftFunc(piece,-1);
 }
 
 //move pawns
@@ -288,6 +307,7 @@ for(let i=0;i<bishops.length;i++) {
         removeAllCircles();
         if(hasCurrentclass(currentBish)) {
             checkDiagonalRight(currentBish);
+            checkDiagonalLeft(currentBish);
             makeAMove(currentBish);
         }
     }
