@@ -276,7 +276,7 @@ function checkDiagonalLeft(piece) {
     checkDiagonalLeftFunc(piece,-1);
 }
 
-function checkLeagleMoveKing(cell) {
+function checkLegalMove(cell) {
     const negativeClass = getNegativeClass();
     if(cell !== undefined){
         if(!cell.hasChildNodes()) {
@@ -286,13 +286,28 @@ function checkLeagleMoveKing(cell) {
     }
 }
 
-function kingHorizontalAndVertical(piece) {
+function kinglegalMoves(piece) {
     const currRow = getCurrentRow(piece);
     const currCol = getCurrentColumn(piece);
     for(let i = -1;i<=1;i++) {
         for(let j=-1;j<=1;j++) {
             const cellAdded = getCell(setLetterFromNum(getColumnNum(currCol) + i), currRow + j);
-            if(!(i === 0 && j === 0)) checkLeagleMoveKing(cellAdded);
+            if(!(i === 0 && j === 0)) checkLegalMove(cellAdded);
+        }
+    }
+}
+
+function knightLegalMove(piece) {
+    const currRow = getCurrentRow(piece);
+    const currCol = getCurrentColumn(piece);
+    for(let i=-2;i<=2;i++) {
+        if(i === 0) i++;
+        for(let j=-2;j<=2;j++) {
+            if(j===0) j++;
+            if(Math.abs(i) !== Math.abs(j)) {
+                const cellAdded = getCell(setLetterFromNum(getColumnNum(currCol) + i), currRow + j);
+                checkLegalMove(cellAdded);
+            }
         }
     }
 }
@@ -361,8 +376,7 @@ for(let i=0; i<kings.length;i++) {
     function kingMove() {
         if(hasCurrentclass(currKing)){
             removeAllCircles();
-            kingHorizontalAndVertical(currKing);
-
+            kinglegalMoves(currKing);
             makeAMove(currKing);
         }
     }
@@ -373,7 +387,11 @@ for(let i=0; i<kings.length;i++) {
 for(let i=0;i<knights.length;i++) {
     const currKnight = knights[i];
     function knightMove() {
-        
+        if(hasCurrentclass(currKnight)){
+        removeAllCircles();
+        knightLegalMove(currKnight);
+        makeAMove(currKnight);
+        }
     }
     currKnight.addEventListener('click',knightMove)
 }
