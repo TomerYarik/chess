@@ -289,22 +289,12 @@ function checkLeagleMoveKing(cell) {
 function kingHorizontalAndVertical(piece) {
     const currRow = getCurrentRow(piece);
     const currCol = getCurrentColumn(piece);
-    const cellForward = getCell(currCol,currRow+1);
-    checkLeagleMoveKing(cellForward);
-    const cellBackwards = getCell(currCol,currRow-1);
-    checkLeagleMoveKing(cellBackwards);
-    const cellLeft = getCell(setLetterFromNum(getColumnNum(currCol)-1),currRow);
-    checkLeagleMoveKing(cellLeft);
-    const cellRight = getCell(setLetterFromNum(getColumnNum(currCol)+1),currRow);
-    checkLeagleMoveKing(cellRight);
-    const cellRightBack = getCell(setLetterFromNum(getColumnNum(currCol)+1),currRow-1);
-    checkLeagleMoveKing(cellRightBack);
-    const cellLeftBack = getCell(setLetterFromNum(getColumnNum(currCol)-1),currRow-1);
-    checkLeagleMoveKing(cellLeftBack);
-    const cellRightFront = getCell(setLetterFromNum(getColumnNum(currCol)+1),currRow+1);
-    checkLeagleMoveKing(cellRightFront);
-    const cellLeftFront = getCell(setLetterFromNum(getColumnNum(currCol)-1),currRow+1);
-    checkLeagleMoveKing(cellLeftFront);
+    for(let i = -1;i<=1;i++) {
+        for(let j=-1;j<=1;j++) {
+            const cellAdded = getCell(setLetterFromNum(getColumnNum(currCol) + i), currRow + j);
+            if(!(i === 0 && j === 0)) checkLeagleMoveKing(cellAdded);
+        }
+    }
 }
 
 //move pawns
@@ -377,4 +367,13 @@ for(let i=0; i<kings.length;i++) {
         }
     }
     currKing.addEventListener('click', kingMove);
+}
+
+//move knights
+for(let i=0;i<knights.length;i++) {
+    const currKnight = knights[i];
+    function knightMove() {
+        
+    }
+    currKnight.addEventListener('click',knightMove)
 }
